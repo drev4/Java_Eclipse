@@ -1,0 +1,80 @@
+import edu.princeton.cs.algs4.Quick;
+import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.StdRandom;
+import edu.princeton.cs.algs4.StdStats;
+
+public class TiempoMedio {
+	ColaAleatoria<Integer> cola;
+	double[] tiemposSort;
+	double[] tiemposSortMedian;
+	int trials;
+	public TiempoMedio(int lon, int rang, int trials){
+		tiemposSort = new double[trials];
+		tiemposSortMedian = new double[trials];
+		this.trials = trials;
+		double antes, des;
+		
+		for(int i = 0; i<trials; i++){
+			cola = new ColaAleatoria<Integer>();
+			for(int j = 0; j<lon; j++){
+				cola.encolar(StdRandom.uniform(rang));		
+			}
+			//QuickSort
+			antes = System.currentTimeMillis();
+			Quick.sort(cola.elementos);
+			des =System.currentTimeMillis();
+			tiemposSort[i] = des-antes;
+			//QuickSortMedian
+			antes = System.currentTimeMillis();
+			Quick.sort(cola.elementos);
+			des =System.currentTimeMillis();
+			tiemposSortMedian[i] = des-antes;
+		}
+		
+	}
+	public double mediaQS(){
+		return StdStats.mean(tiemposSort);
+	}
+	public double mediaQSM(){
+		return StdStats.mean(tiemposSortMedian);
+	}
+	public double desvQS(){
+		return StdStats.stddev(tiemposSort);
+	}
+	public double desvQSM(){
+		return StdStats.stddev(tiemposSortMedian);
+	}
+	public double confidenceLoQS() {
+        return mediaQS() - 1.96 * desvQS() / Math.sqrt(trials);
+    }
+	public double confidenceLoQSM() {
+        return mediaQSM() - 1.96 * desvQSM() / Math.sqrt(trials);
+    }
+	public double confidenceHiQS() {
+        return mediaQS() + 1.96 * desvQS() / Math.sqrt(trials);
+    }
+	public double confidenceHiQSM() {
+        return mediaQSM() + 1.96 * desvQSM() / Math.sqrt(trials);
+    }
+	public static void main(String[] args) {
+		StdOut.println("Introduce la longitud de la cola aleatoria: ");
+		int lon=StdIn.readInt();
+		StdOut.println("Introduce el rango de enteros: ");
+		int rango=StdIn.readInt();
+		StdOut.println("Introduce el numero de pruebas: ");
+		int pruebas=StdIn.readInt();
+		
+		TiempoMedio t = new TiempoMedio(lon, rango, pruebas);
+		//QuickSort
+		StdOut.println("QuickSort normal:");
+		StdOut.println("Media = " + t.mediaQS());
+		StdOut.println("Desviacion = " + t.desvQS());
+		StdOut.println("intervalo de confianza = " + t.confidenceLoQS() + t.confidenceHiQS());
+		//QuickSortMedian
+		StdOut.println("QuickSortMedian:");
+		StdOut.println("Media = " + t.mediaQSM());
+		StdOut.println("Desviacion = " + t.desvQSM());
+		StdOut.println("intervalo de confianza = " + t.confidenceLoQSM() + t.confidenceHiQSM());
+	}
+}
